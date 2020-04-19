@@ -3,7 +3,7 @@ namespace Bobby\Queue;
 
 use Bobby\MultiProcesses\Process;
 use Bobby\MultiProcesses\Quit;
-use Bobby\Queue\Drivers\QueueContract;
+use Bobby\Queue\QueueContract;
 use Bobby\Queue\Utils\ConsoleLogger;
 
 class ConsumerProcess extends Process
@@ -44,6 +44,8 @@ class ConsumerProcess extends Process
                 continue;
             }
 
+            $this->logger->debug("processing message job id: $id");
+
             $this->runMessageJob($id);
 
             if ($this->ifUsedMemoryExceed()) {
@@ -75,7 +77,7 @@ class ConsumerProcess extends Process
             } else {
                 $startTime = time();
                 register_tick_function(function () use ($startTime, $messageJob, $messageId) {
-                    if (time() - $startTime > $messageJob->timeoutAt()) {
+                    if ($messageJob->timeoutAt() > 0 && time() - $startTime > $messageJob->timeoutAt()) {
                         throw new \RuntimeException("Message id:$messageId is time out.");
                     }
                 });
@@ -86,15 +88,28 @@ class ConsumerProcess extends Process
 
                 declare(ticks = 0);
             }
+
+            $this->doneMessageJob($messageId);
         } catch (\Throwable $e) {
-            $this->logger->error($e->getTraceAsString());
+            $this->logger->error($e);
 
             if ($messageJob instanceof JobContract) {
+                $messageJob->failed($messageId, $e);
+
                 if ($messageJob->canRetry($attempts = $this->queue->getMessageAttempts($messageId), $e)) {
                     $this->queue->release($messageId, $messageJob->retryAfter($attempts));
+                    return;
                 }
             }
+
+            $this->queue->fail($messageId);
         }
+    }
+
+    protected function doneMessageJob(int $messageId)
+    {
+        $this->queue->done($messageId);
+        $this->logger->debug("Processed message job id: $messageId");
     }
 
     protected function ifUsedMemoryExceed(): bool

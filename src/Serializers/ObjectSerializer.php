@@ -1,6 +1,8 @@
 <?php
 namespace Bobby\Queue\Serializers;
 
+use Bobby\Queue\SerializerContract;
+
 class ObjectSerializer implements SerializerContract
 {
 

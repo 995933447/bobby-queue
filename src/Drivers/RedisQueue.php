@@ -1,12 +1,13 @@
 <?php
-namespace Bobby\Queue\Drivers\RedisQueue;
+namespace Bobby\Queue\Drivers;
 
 use Bobby\Queue\JobContract;
-use Bobby\Queue\Drivers\QueueContract;
+use Bobby\Queue\QueueContract;
 use Bobby\Queue\Connections\RedisPool;
 use Bobby\Queue\Utils\SerializerTrait;
 use Predis\Client;
 use Bobby\Queue\SerializedMessage;
+use Bobby\Queue\Utils\QueueRedisKeyGenerator;
 
 class RedisQueue extends QueueContract
 {
@@ -31,7 +32,7 @@ class RedisQueue extends QueueContract
      */
     protected function beforeConstruct(string $channel, array $options)
     {
-        $this->redisKeyGenerator = RedisKeyGenerator::make($channel);
+        $this->redisKeyGenerator = QueueRedisKeyGenerator::make($channel);
     }
 
     /**
@@ -287,9 +288,11 @@ class RedisQueue extends QueueContract
                 time()
             );
 
-            foreach ($expiredIds as $id) {
-                $this->getConnection()->lpush($this->redisKeyGenerator->getQueueListKey(), [$id]);
-                $this->getConnection()->zrem($delayedMessagesKey, $id);
+            if ($expiredIds) {
+                foreach ($expiredIds as $id) {
+                    $this->getConnection()->lpush($this->redisKeyGenerator->getQueueListKey(), [$id]);
+                    $this->getConnection()->zrem($delayedMessagesKey, $id);
+                }
             }
         } catch (\Throwable $e) {
             throw $e;

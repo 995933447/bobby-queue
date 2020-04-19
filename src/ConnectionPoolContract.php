@@ -1,5 +1,5 @@
 <?php
-namespace Bobby\Queue\Connections;
+namespace Bobby\Queue;
 
 abstract class ConnectionPoolContract
 {
@@ -22,7 +22,7 @@ abstract class ConnectionPoolContract
         if ($this->pool->count() > 0) {
             $connection = $this->pool->pop();
 
-            if ($this->connectionIsAlive($connection)) {
+            if (!$this->connectionIsAlive($connection)) {
                 $connection = $this->createConnection();
             }
         } else {

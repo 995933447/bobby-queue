@@ -5,11 +5,11 @@ $config = [
     'connection' => []
 ];
 
-$queue = new \Bobby\Queue\Drivers\RedisQueue\RedisQueue("default", $config);
+$queue = new \Bobby\Queue\Drivers\RedisQueue("default", $config);
 
 $queue->push(function () {
     echo "Hello world 2!\n";
-});
+}, 5);
 
 //while (1) {
 //    $id = $queue->pop();

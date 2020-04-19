@@ -1,7 +1,7 @@
 <?php
 namespace Bobby\Queue\Connections;
 
-use Bobby\Queue\Connections\ConnectionPoolContract;
+use Bobby\Queue\ConnectionPoolContract;
 use Predis\Client;
 
 class RedisPool extends ConnectionPoolContract

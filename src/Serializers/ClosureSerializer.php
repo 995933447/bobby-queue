@@ -2,6 +2,7 @@
 namespace Bobby\Queue\Serializers;
 
 use SuperClosure\Serializer;
+use Bobby\Queue\SerializerContract;
 
 class ClosureSerializer implements SerializerContract
 {

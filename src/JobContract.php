@@ -33,9 +33,9 @@ interface JobContract
      * After failed, this function will be called.
      *
      * @param int   $id
-     * @param array $payload
+     * @param \Throwable $e
      */
-    public function failed(int $id, array $payload);
+    public function failed(int $id, \Throwable $e);
 
     /**Job execute max time.
      * @return int

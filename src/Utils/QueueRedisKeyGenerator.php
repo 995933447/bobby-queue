@@ -1,7 +1,7 @@
 <?php
-namespace Bobby\Queue\Drivers\RedisQueue;
+namespace Bobby\Queue\Utils;
 
-final class RedisKeyGenerator
+final class QueueRedisKeyGenerator
 {
     const CHANNEL_PREFIX = 'bobby-queue';
 

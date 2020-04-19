@@ -2,7 +2,7 @@
 namespace Bobby\Queue;
 
 use Bobby\MultiProcesses\Process;
-use Bobby\Queue\Drivers\QueueContract;
+use Bobby\Queue\QueueContract;
 use Bobby\Queue\Utils\ConsoleLogger;
 
 class ConsumerProcessesManager
@@ -45,8 +45,12 @@ class ConsumerProcessesManager
 
     protected function workAndListenConsumers()
     {
+        $this->queue->retryReserved();
+
         $this->readyMonitorConsumers();
+
         $this->runConsumers();
+
         $this->monitorConsumers();
     }
 
@@ -54,9 +58,17 @@ class ConsumerProcessesManager
     {
         $this->isRunning = true;
 
+        pcntl_signal(SIGINT, function () {
+            foreach ($this->consumers as $consumer) {
+                posix_kill($consumer->getPid(), SIGTERM);
+            }
+
+            $this->isRunning = false;
+        });
+
         pcntl_signal(SIGTERM, function () {
             foreach ($this->consumers as $consumer) {
-                posix_kill($consumer->getPid, SIGTERM);
+                posix_kill($consumer->getPid(), SIGUSR1);
             }
 
             $this->isRunning = false;
@@ -64,25 +76,19 @@ class ConsumerProcessesManager
 
         pcntl_signal(SIGUSR1, function () {
             foreach ($this->consumers as $consumer) {
-                posix_kill($consumer->getPid, SIGUSR1);
+                posix_kill($consumer->getPid(), SIGTERM);
             }
-
-            $this->isRunning = false;
         });
 
         pcntl_signal(SIGUSR2, function () {
             foreach ($this->consumers as $consumer) {
-                posix_kill($consumer, SIGUSR1);
+                posix_kill($consumer->getPid(), SIGUSR1);
             }
-
-            $this->runConsumers();
         });
 
         pcntl_signal(SIGALRM, function () {
             $this->queue->migrateExpiredJobs();
         });
-
-        pcntl_alarm(1);
 
         if (function_exists('pcntl_async_signals')) {
             if (!pcntl_async_signals()) {
@@ -94,7 +100,7 @@ class ConsumerProcessesManager
 
     protected function runConsumers()
     {
-        $consumerNum = $this->options['process_num']?? 1;
+        $consumerNum = $this->options['consumer']['process_num']?? 1;
         for ($i = 0; $i < $consumerNum; $i++) {
             $this->createConsumer();
         }
@@ -132,6 +138,8 @@ class ConsumerProcessesManager
 
     protected function dispatchSignals()
     {
+        pcntl_alarm(1);
+
         if (!$this->asyncListenSignals) {
             pcntl_signal_dispatch();
         }

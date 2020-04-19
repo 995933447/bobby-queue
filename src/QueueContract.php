@@ -1,5 +1,5 @@
 <?php
-namespace Bobby\Queue\Drivers;
+namespace Bobby\Queue;
 
 abstract class QueueContract
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Bobby\Queue\Serializers;
+namespace Bobby\Queue;
 
 interface SerializerContract
 {
