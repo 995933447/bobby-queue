@@ -1,0 +1,24 @@
+{
+    "name": "bobby/queue",
+    "description": "Like laravel queue.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "bobby",
+            "email": "995933447@qq.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "predis/predis": "^1.1",
+        "jeremeamia/superclosure": "^2.4",
+        "monolog/monolog": "^2.0",
+        "bobby/multi-processes": "dev-master"
+    },
+    "autoload": {
+      "psr-4": {
+        "Bobby\\Queue\\": "src/"
+      }
+    }
+}
