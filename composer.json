@@ -1,6 +1,6 @@
 {
     "name": "bobby/queue",
-    "description": "Like laravel queue.",
+    "description": "Like laravel queue.It is a component that can run independently.",
     "type": "library",
     "license": "MIT",
     "authors": [
