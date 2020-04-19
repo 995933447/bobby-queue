@@ -1,5 +1,4 @@
 <?php
-
 class ExampleJob implements \Bobby\Queue\JobContract
 {
 
