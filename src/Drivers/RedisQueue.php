@@ -114,6 +114,8 @@ class RedisQueue extends QueueContract
         }
 
         $this->connectionPool->recycle($connection);
+
+        $this->connection = null;
     }
 
     /**

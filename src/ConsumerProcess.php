@@ -39,6 +39,7 @@ class ConsumerProcess extends Process
 
         while ($this->isRunning) {
             $id = $this->queue->pop();
+
             if (is_null($id)) {
                 sleep($this->options['sleep_seconds']?? 1);
                 continue;
