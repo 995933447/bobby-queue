@@ -10,7 +10,7 @@ class ConsoleLogger
     {
         $name = sprintf('bobby-queue-%s', $options['channel'] ?? 'default');
         $this->executor = new Logger($name);
-        $stdoutHandler = new StreamHandler(STDOUT, $options['level'] ?? Logger::INFO);
+        $stdoutHandler = new StreamHandler(STDOUT, $options['level'] ?? Logger::DEBUG);
         $this->executor->setHandlers([$stdoutHandler]);
     }
 

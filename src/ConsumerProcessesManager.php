@@ -90,6 +90,10 @@ class ConsumerProcessesManager
             $this->queue->migrateExpiredJobs();
         });
 
+        pcntl_signal(SIGIO, function () {
+           $this->queue->releaseAllFailed();
+        });
+
         if (function_exists('pcntl_async_signals')) {
             if (!pcntl_async_signals()) {
                 pcntl_async_signals(true);

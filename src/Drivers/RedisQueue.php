@@ -317,9 +317,11 @@ class RedisQueue extends QueueContract
     public function retryReserved()
     {
         try {
-            $ids = $this->getConnection()->zrange($this->redisKeyGenerator->getDelayedMessagesZsetKey(), 0, -1);
-            foreach ($ids as $id) {
-                $this->release($id);
+            $ids = $this->getConnection()->zrange($this->redisKeyGenerator->getReservedMessagesZsetKey(), 0, -1);
+            if ($ids) {
+                foreach ($ids as $id) {
+                    $this->release($id);
+                }
             }
         } catch (\Throwable $e) {
             throw $e;
@@ -331,5 +333,21 @@ class RedisQueue extends QueueContract
     public function resetConnection()
     {
         $this->connectionPool = new RedisPool($this->options['connection']?? []);
+    }
+
+    public function releaseAllFailed()
+    {
+        try {
+            $ids = $this->getConnection()->zrange($this->redisKeyGenerator->getFailedMessageZsetMessages(), 0, -1);
+            if ($ids) {
+                foreach ($ids as $id) {
+                    $this->release($id);
+                }
+            }
+        } catch (\Throwable $e) {
+            throw $e;
+        } finally {
+            $this->releaseConnection();
+        }
     }
 }

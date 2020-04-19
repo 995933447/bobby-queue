@@ -127,13 +127,18 @@ abstract class QueueContract
      */
     abstract public function getMessageAttempts(int $id): int;
 
-    /**
+    /**Retry reserved message job
      * @return mixed
      */
     abstract public function retryReserved();
 
-    /**
+    /**Reset queue connection
      * @return mixed
      */
     abstract public function resetConnection();
+
+    /**Release all failed message job
+     * @return mixed
+     */
+    abstract public function releaseAllFailed();
 }

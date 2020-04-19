@@ -68,6 +68,7 @@ class ConsumerProcess extends Process
     protected function runMessageJob($messageId)
     {
         $messageJob = $this->queue->get($messageId);
+
         if (!$messageJob instanceof \Closure && !$messageJob instanceof JobContract) {
             return;
         }
