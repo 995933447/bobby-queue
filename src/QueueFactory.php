@@ -5,7 +5,7 @@ class QueueFactory
 {
     public static function make(string $channel, array $options)
     {
-        if (isset($options['driver']) || class_exists($options['driver'])) {
+        if (!isset($options['driver']) || !class_exists($options['driver'])) {
             throw new \InvalidArgumentException(sprintf("Queue driver class:%s not found.", $options['driver']?? ''));
         }
 

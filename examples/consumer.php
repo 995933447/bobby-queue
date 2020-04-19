@@ -1,8 +1,9 @@
 <?php
 require __DIR__ . "/../vendor/autoload.php";
 require "./ExampleJob.php";
+$config = require "./config.php";
 
-$queue = new \Bobby\Queue\Drivers\RedisQueue("default", []);
+$queue = \Bobby\Queue\QueueFacade::make($config)->getQueue();
 $manager = new \Bobby\Queue\ConsumerProcessesManager($queue, [
     'consumer' => [
         'daemonize' => false,

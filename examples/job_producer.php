@@ -1,6 +1,6 @@
 <?php
 require __DIR__ ."/../vendor/autoload.php";
 require "./ExampleJob.php";
+$config = require "./config.php";
 
-$queue = new \Bobby\Queue\Drivers\RedisQueue('default', []);
-$queue->push(new ExampleJob());
+\Bobby\Queue\QueueFacade::make($config)->push(new ExampleJob());

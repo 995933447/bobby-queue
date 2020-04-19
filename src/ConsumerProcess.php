@@ -104,6 +104,7 @@ class ConsumerProcess extends Process
                 }
             }
 
+            $this->logger->debug("Failed message job id: $messageId");
             $this->queue->fail($messageId);
         }
     }

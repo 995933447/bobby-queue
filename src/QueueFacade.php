@@ -26,32 +26,30 @@ class QueueFacade
     public function channel(string $channel): QueueFacade
     {
         if ($this->channel != $channel) {
+            $this->channel = $channel;
             $this->queue = null;
         }
-
-        $this->channel = $channel;
 
         return $this;
     }
 
     public function connection(string $connection): QueueFacade
     {
-        if (!isset($this->options[$connection])) {
-            throw new \InvalidArgumentException("Inputted config has not $connection options.");
+        if (!isset($this->config['connections'][$connection])) {
+            throw new \InvalidArgumentException("Inputted config has not $connection connection options.");
         }
 
-        if ($this->connectionOptions !== $this->config['connection']) {
+        if ($this->connectionOptions !== $this->config['connections'][$connection]) {
+            $this->connectionOptions = $this->config['connections'][$connection];
             $this->queue = null;
         }
-
-        $this->connectionOptions = $this->config[$connection];
 
         return $this;
     }
 
     public function getQueue(): QueueContract
     {
-        if (!is_null($this->queue)) {
+        if (is_null($this->queue)) {
             if (is_null($this->connectionOptions)) {
                 if (isset($this->config['default'])) {
                     $this->connection($this->config['default']);

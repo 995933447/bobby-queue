@@ -1,13 +1,8 @@
 <?php
 require __DIR__ . "/../vendor/autoload.php";
+$config = require "./config.php";
 
-$config = [
-    'connection' => []
-];
-
-$queue = new \Bobby\Queue\Drivers\RedisQueue("default", $config);
-
-$queue->push(function () {
+\Bobby\Queue\QueueFacade::make($config)->push(function () {
     echo "Hello world 2!\n";
 }, 5);
 
