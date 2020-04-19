@@ -137,6 +137,29 @@ abstract class QueueContract
      */
     abstract public function resetConnection();
 
+    /**
+     * Get all failed jobs.
+     *
+     * @return array
+     *
+     * @throws \Throwable
+     */
+    abstract public function getAllFailed(): array;
+
+    /**
+     * Clear failed job.
+     *
+     * @param int $id
+     *
+     * @throws \Throwable
+     */
+    abstract public function clearFailed(int $id);
+
+    /**Clear all failed job.
+     * @return mixed
+     */
+    abstract public function clearAllFailed();
+
     /**Release all failed message job
      * @return mixed
      */

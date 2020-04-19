@@ -110,12 +110,13 @@ class RedisQueue extends QueueContract
     protected function releaseConnection(Client $connection = null)
     {
         if (is_null($connection)) {
-            $connection = $this->getConnection();
+            $connection = $this->connection;
         }
 
-        $this->connectionPool->recycle($connection);
-
-        $this->connection = null;
+        if (!is_null($connection)) {
+            $this->connectionPool->recycle($connection);
+            $this->connection = null;
+        }
     }
 
     /**
@@ -338,11 +339,49 @@ class RedisQueue extends QueueContract
     public function releaseAllFailed()
     {
         try {
-            $ids = $this->getConnection()->zrange($this->redisKeyGenerator->getFailedMessageZsetMessages(), 0, -1);
+            $ids = $this->getAllFailed();
             if ($ids) {
                 foreach ($ids as $id) {
                     $this->release($id);
                 }
+            }
+        } catch (\Throwable $e) {
+            throw $e;
+        } finally {
+            $this->releaseConnection();
+        }
+    }
+
+    public function getAllFailed(): array
+    {
+        try {
+            $ids = $this->getConnection()->zrange($this->redisKeyGenerator->getFailedMessageZsetMessages(), 0, -1);
+        } catch (\Throwable $e) {
+            throw $e;
+        } finally {
+            $this->releaseConnection();
+        }
+
+        return $ids;
+    }
+
+    public function clearFailed(int $id)
+    {
+        try {
+            $this->getConnection()->zrem($this->redisKeyGenerator->getFailedMessageZsetMessages(), $id);
+        } catch (\Throwable $e) {
+            throw $e;
+        } finally {
+            $this->releaseConnection();
+        }
+    }
+
+    public function clearAllFailed()
+    {
+        try {
+            $ids = $this->getAllFailed();
+            foreach ($ids as $id) {
+                $this->clearFailed($id);
             }
         } catch (\Throwable $e) {
             throw $e;
