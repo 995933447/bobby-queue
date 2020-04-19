@@ -3,6 +3,8 @@ namespace Bobby\Queue;
 
 class QueueFacade
 {
+    const DEFAULT_CHANNEL = 'default';
+
     protected $config;
 
     protected $channel;
@@ -58,7 +60,7 @@ class QueueFacade
                 }
             }
 
-            $this->queue = QueueFactory::make($this->channel, $this->connectionOptions);
+            $this->queue = QueueFactory::make($this->channel?: static::DEFAULT_CHANNEL, $this->connectionOptions);
         }
 
         return $this->queue;
